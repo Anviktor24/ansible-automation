@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tervitus - {{ ansible_hostname }}</title>
+</head>
+<body>
+    <h1>Tere tulemast serverisse {{ ansible_hostname }}!</h1>
+    <p>Selle serveri IP-aadress on: <strong>{{ ansible_default_ipv4.address }}</strong></p>
+    <p>Leht genereeritud Ansible abil automaatselt.</p>
+</body>
+</html>

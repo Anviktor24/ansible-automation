@@ -1,0 +1,82 @@
+---
+# Lab 2: Veebiserveri (Apache2) automatiseerimine
+- hosts: webservers
+  become: yes
+  tasks:
+
+    # 1. Debian (Apache2) paigaldus
+    - name: Paigaldatakse veebiserver Apache2 (Debian)
+      apt:
+        name: apache2
+        update_cache: yes
+        state: latest
+      when: ansible_os_family == "Debian"
+
+    # 1b. CentOS (httpd) paigaldus
+    - name: Paigaldatakse veebiserver httpd (CentOS)
+      dnf:
+        name: httpd
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    # 2. Kasutaja olemasolu
+    - name: Veendume, et kasutaja 'user' on süsteemis olemas
+      user:
+        name: user
+        state: present
+        shell: /bin/bash
+
+    # 3. public_html kaust
+    - name: Loome public_html kausta user_ile
+      file:
+        path: /home/user/public_html
+        state: directory
+        owner: user
+        group: user
+        mode: '0755'
+
+    # 4. userdir moodul (Debian)
+    - name: Lubame veebiserveritel userdir mooduli (Debian)
+      apache2_module:
+        name: userdir
+        state: present
+      when: ansible_os_family == "Debian"
+
+    # 5. Teenuse taaskäivitamine
+    - name: Veebiserveri taaskäivitamine
+      service:
+        name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+        state: restarted
+
+    # 6. Vaikelehe kopeerimine
+    - name: Kopeerime index.html faili USER_ile kodus_public_html kataloogi
+      copy:
+        src: /var/www/html/index.html
+        dest: /home/user/public_html/
+        remote_src: yes
+        owner: user
+        group: user
+      ignore_errors: yes
+
+    # 7. User index.html redigeerimine
+    - name: User index.html redigeerimine
+      lineinfile:
+        path: /home/user/public_html/index.html
+        regexp: 'Apache2 Debian Default Page'
+        line: 'USER_i lehekylg'
+      ignore_errors: yes
+
+    # 8. Unikaalne index.html vaikeleht (Iseseisev ülesanne)
+    - name: Paigaldame unikaalse index.html vaikelehe
+      template:
+        src: index.html.j2
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+
+    # 9. Lõplik taaskäivitamine
+    - name: Lõplik veebiserveri taaskäivitamine
+      service:
+        name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+        state: restarted
