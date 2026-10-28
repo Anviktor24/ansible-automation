@@ -1,0 +1,23 @@
+---
+# Lab 4 Iseseisev ülesanne: MySQL/MariaDB root kasutaja ja .my.cnf seadistamine
+- hosts: webservers
+  become: yes
+  tasks:
+
+    - name: Seadistame root kasutajale parooli 'qwerty'
+      shell: |
+        mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'qwerty'; FLUSH PRIVILEGES;" || \
+        mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('qwerty'); FLUSH PRIVILEGES;" || \
+        mysql -u root -pqwerty -e "SELECT 1;"
+      ignore_errors: yes
+
+    - name: Loome /root/.my.cnf faili root kasutaja ja parooliga
+      copy:
+        dest: /root/.my.cnf
+        owner: root
+        group: root
+        mode: '0600'
+        content: |
+          [client]
+          user=root
+          password=qwerty

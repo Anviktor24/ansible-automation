@@ -1,0 +1,53 @@
+---
+# Lab 4: MySQL/MariaDB serveri paigaldamine
+- hosts: webservers
+  become: yes
+  tasks:
+
+    - name: Loome kataloogi allalaadimiseks
+      file:
+        path: /root/allalaadimised
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Laadime MySQL APT paketi (Debian)
+      shell: |
+        wget -O /root/allalaadimised/mysql-apt-config_0.8.36-1_all.deb https://dev.mysql.com/get/mysql-apt-config_0.8.36-1_all.deb
+      when: ansible_os_family == "Debian"
+
+    - name: Paigalda gnupg (Debian)
+      apt:
+        name: gnupg
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Installeerime mysql repositooriumi (Debian)
+      apt:
+        deb: /root/allalaadimised/mysql-apt-config_0.8.36-1_all.deb
+      when: ansible_os_family == "Debian"
+
+    - name: Uuendame apt puhvrit (Debian)
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Paigaldame mysql-server (Debian)
+      apt:
+        name: mysql-server
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Paigaldame mariadb-server (CentOS)
+      dnf:
+        name: mariadb-server
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Käivitame ja lubame MySQL/MariaDB teenuse
+      service:
+        name: "{{ 'mysql' if ansible_os_family == 'Debian' else 'mariadb' }}"
+        state: started
+        enabled: yes
