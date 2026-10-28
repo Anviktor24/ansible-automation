@@ -1,0 +1,24 @@
+---
+# Linuxi süsteemi kasutajate (root ja tavakasutaja) seadistamine
+- hosts: webservers
+  become: yes
+  vars:
+    tavakasutaja: "viktor"          # <-- Soovitud tavakasutaja nimi
+    tavakasutaja_parool: "qwerty"   # <-- Tavakasutaja parool
+
+  tasks:
+
+    - name: Seadistame root kasutajale parooli 'qwerty'
+      user:
+        name: root
+        password: "{{ 'qwerty' | password_hash('sha512') }}"
+
+    - name: Loome tavakasutaja koos sudo õigustega
+      user:
+        name: "{{ tavakasutaja }}"
+        password: "{{ tavakasutaja_parool | password_hash('sha512') }}"
+        state: present
+        create_home: yes
+        shell: /bin/bash
+        groups: "{{ 'sudo' if ansible_os_family == 'Debian' else 'wheel' }}"
+        append: yes
