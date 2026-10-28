@@ -1,5 +1,5 @@
 ---
-# Lab 4 Iseseisev ülesanne: MySQL/MariaDB root kasutaja ja .my.cnf seadistamine
+# Lab 4 Iseseisev ülesanne: MySQL root seadistamine ja OS kasutaja loomine
 - hosts: webservers
   become: yes
   tasks:
@@ -21,3 +21,10 @@
           [client]
           user=root
           password=qwerty
+
+    - name: Loome serverisse uue Linuxi süsteemi tavakasutaja
+      user:
+        name: peeter
+        state: present
+        create_home: yes
+        shell: /bin/bash
