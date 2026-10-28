@@ -1,30 +1,25 @@
-# Lab 1: Ansible automatiseerimislahendus
+# Ansible Infrastruktuuri Automatiseerimine (VOCO)
 
-See repositoorium sisaldab Tartu Rakendusliku Kolledži (VOCO) oppeaine **SKPVA** labor 1 materjale ja seadistusi. Projekti eesmärk on paigaldada Ansible juhtserver ning seadistada SSH-põhine haldus kahe kliendiserveri üle.
+Käesolev repositoorium sisaldab Tartu Rakendusliku Kolledži (VOCO) raames loodud Ansible automatiseerimise skripte, inventarifaile ja playbook'e veebiserverite ning andmebaaside haldamiseks eriilmelises operatsioonisüsteemide keskkonnas (Debian 12 ja CentOS Stream 10).
 
----
+## 🛠️ Taristu Arhitektuur
 
-## 📐 Võrgulahendus ja arhitektuur
-
-* **Ansible juhtserver (Control Node):** Debian 12 (`root@viktor`)
-* **Klient 1 (Managed Node 1):** Debian (`serverklient1`)
-* **Klient 2 (Managed Node 2):** CentOS Stream (`serverklient2` – `192.168.37.138`)
-
-Kõik seadistused ja hallatavad ühendused sooritatakse `root`-kasutaja õigustes läbi turvalise SSH-võtmepaari.
+| Sõlm (Node) | Kasutaja / IP | Operatsioonisüsteem | Roll / Teenused |
+| :--- | :--- | :--- | :--- |
+| **Control Node** | `root@192.168.37.169` | Debian 12 | Ansible juhtserver, Git |
+| **Managed Node 1** | `serverklient1` (`192.168.37.177`) | Debian 12 | Apache2, MySQL 8.0 |
+| **Managed Node 2** | `serverklient2` (`192.168.37.138`) | CentOS Stream 10 | Apache2 (httpd), MariaDB 10.11 |
 
 ---
 
-## 📁 Repositooriumi struktuur
+## 📁 Projekti Struktuur
 
-* `hosts` – Ansible inventarifail (Inventory), kus on kirjeldatud hallatavad serverid ja nende parameetrid.
-* `ansible.cfg` – Ansible peakonfiguratsioonifail (vaike-inventar, ühenduse viited jm).
-* `README.md` – Projekti dokumentatsioon.
-
----
-
-## ⚙️ Seadistamine ja paigaldus
-
-### 1. Juhtserveri ettevalmistus
-1. Paigalda Ansible:
-   ```bash
-   apt update && apt install -y ansible git
+```text
+ansible-automation/
+├── ansible.cfg              # Ansible globaalne konfigureerimisfail
+├── hosts                    # Inventarifail (Debian ja CentOS kliendid)
+├── playbooks/
+│   ├── webserver.yml        # Lab 2: Veebiserverite paigaldus ja konfigureerimine
+│   ├── mysql-server.yml     # Lab 4: MySQL/MariaDB teenuse paigaldus ja käivitus
+│   └── mysql-user.yml       # Lab 4: Root kasutaja parooli ja .my.cnf seadistamine
+└── README.md                # Projekti dokumentatsioon
