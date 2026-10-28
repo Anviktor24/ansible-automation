@@ -1,5 +1,5 @@
 [webservers]
-serverklient1 ansible_host=<debian_klient_IP> ansible_user=root
+serverklient1 ansible_host=192.168.37.177 ansible_user=root
 serverklient2 ansible_host=192.168.37.138 ansible_user=root
 
 [webservers:vars]
